@@ -3,27 +3,18 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Bookmark;
+use App\Models\ProductsRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ApiBookmarkController extends Controller
+class RatingController extends Controller
 {
     public function index()
     {
-        $bookmark = Bookmark::all();
+        $rating = ProductsRating::all();
         return response()->json([
             'status' => 'success',
-            'data' => $bookmark,
-        ]);
-    }
-
-    public function show($id)
-    {
-        $bookmark = Bookmark::where('user_id', $id)->get();
-        return response()->json([
-            'status' => 'success',
-            'data' => $bookmark,
+            'data' => $rating
         ]);
     }
 
@@ -32,11 +23,15 @@ class ApiBookmarkController extends Controller
         try {
             DB::beginTransaction();
             $validate = $request->validate([
+                'name' => 'required|',
+                'user_id' => 'required',
+                'review' => 'required|',
+                'rating' => 'required|numeric',
+                'status' => 'required|',
                 'warungmakan_id' => 'required|numeric',
-                'user_id' => 'required|numeric',
             ]);
 
-            $rating = new Bookmark();
+            $rating = new ProductsRating();
             $rating->fill($validate);
             $rating->save();
 
@@ -55,19 +50,18 @@ class ApiBookmarkController extends Controller
         }
     }
 
-    public function deleteData($id)
+    public function show($user_id)
     {
-        try {
-            $bookmark = Bookmark::where('id', $id);
-            $bookmark->delete();
+        $rating = ProductsRating::where('user_id', $user_id)->get();
+        if ($rating) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Bookmark berhasil dihapus',
+                'data' => $rating
             ]);
-        } catch (\Exception $e) {
+        } else {
             return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
+                'status' => 'failed',
+                'message' => 'Data not found'
             ]);
         }
     }

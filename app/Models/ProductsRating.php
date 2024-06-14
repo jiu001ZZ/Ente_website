@@ -9,5 +9,5 @@ class ProductsRating extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'rating', 'review', 'warungmakan_id'];
+    protected $guarded = [''];
 }
